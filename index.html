@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Links</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Segoe UI, Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f3d75, #38bdf8);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 1300px;
+      margin: auto;
+      padding: 25px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .filter-btn {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      background: #dbeafe;
+      color: #0f3d75;
+      font-weight: bold;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: #0f3d75;
+      color: white;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    }
+
+    h2 {
+      color: #0f3d75;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn-save {
+      width: 100%;
+      margin-top: 20px;
+      border: none;
+      background: #22c55e;
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .links-grid {
+      display: grid;
+      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .link-card {
+      background: white;
+      border-radius: 15px;
+      padding: 18px;
+      box-shadow: 0 5px 15px rgba(0,0,0,.08);
+      border-left: 6px solid #facc15;
+    }
+
+    .categoria {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: #dbeafe;
+      color: #0f3d75;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .titulo {
+      font-size: 18px;
+      font-weight: bold;
+      color: #0f3d75;
+      margin-bottom: 10px;
+    }
+
+    .descricao {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .acoes {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-abrir {
+      flex: 1;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .btn-excluir {
+      border: none;
+      background: #ef4444;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .empty {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      color: #777;
+    }
+
+    @media(max-width:900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Central de Links</h1>
+  <p>Acesse rapidamente seus sistemas favoritos</p>
+</header>
+
+<main>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filtrar('Todos', this)">Todos</button>
+    <button class="filter-btn" onclick="filtrar('Corporativo', this)">Corporativo</button>
+    <button class="filter-btn" onclick="filtrar('Pessoal', this)">Pessoal</button>
+    <button class="filter-btn" onclick="filtrar('Clientes', this)">Clientes</button>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>Novo Link</h2>
+
+      <form id="formLink">
+        <label>Nome do Sistema</label>
+        <input type="text" id="nome" required>
+
+        <label>Categoria</label>
+        <select id="categoria" required>
+          <option value="">Selecione</option>
+          <option value="Corporativo">Corporativo</option>
+          <option value="Pessoal">Pessoal</option>
+          <option value="Clientes">Clientes</option>
+        </select>
+
+        <label>Link do Sistema</label>
+        <input type="url" id="link" required placeholder="https://exemplo.com">
+
+        <label>Descrição</label>
+        <textarea id="descricao"></textarea>
+
+        <button type="submit" class="btn-save">Salvar Link</button>
+      </form>
+    </div>
+
+    <div>
+      <div class="card search-box">
+        <input
+          type="text"
+          id="busca"
+          placeholder="Pesquisar sistema..."
+          onkeyup="renderizarLinks()"
+        >
+      </div>
+
+      <div id="listaLinks" class="links-grid"></div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuSAF6BmB_UNiEw3BQhZ9RPVqM2X7jTORjtnI2-sIEZbSUGcIjBs7RDKVD7GGVWSCK/exec";
+
+  let links = [];
+  let filtroAtual = "Todos";
+
+  document.getElementById("formLink").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const item = {
+      id: Date.now(),
+      nome: document.getElementById("nome").value,
+      categoria: document.getElementById("categoria").value,
+      link: document.getElementById("link").value,
+      descricao: document.getElementById("descricao").value
+    };
+
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(item)
+    });
+
+    this.reset();
+    carregarLinks();
+  });
+
+  async function carregarLinks() {
+    const resposta = await fetch(SCRIPT_URL);
+    links = await resposta.json();
+    renderizarLinks();
+  }
+
+  function filtrar(categoria, botao) {
+    filtroAtual = categoria;
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    botao.classList.add("active");
+    renderizarLinks();
+  }
+
+  async function excluir(id) {
+    if (!confirm("Deseja excluir este link?")) return;
+
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "delete",
+        id: id
+      })
+    });
+
+    carregarLinks();
+  }
+
+  function renderizarLinks() {
+    const lista = document.getElementById("listaLinks");
+    const textoBusca = document.getElementById("busca").value.toLowerCase();
+
+    const resultado = links.filter(item => {
+      const categoriaOk =
+        filtroAtual === "Todos" || item.categoria === filtroAtual;
+
+      const buscaOk =
+        String(item.nome).toLowerCase().includes(textoBusca) ||
+        String(item.categoria).toLowerCase().includes(textoBusca) ||
+        String(item.descricao).toLowerCase().includes(textoBusca) ||
+        String(item.link).toLowerCase().includes(textoBusca);
+
+      return categoriaOk && buscaOk;
+    });
+
+    if (resultado.length === 0) {
+      lista.innerHTML = `<div class="empty">Nenhum sistema encontrado.</div>`;
+      return;
+    }
+
+    lista.innerHTML = resultado.map(item => `
+      <div class="link-card">
+        <div class="categoria">${item.categoria}</div>
+        <div class="titulo">${item.nome}</div>
+        <div class="descricao">${item.descricao || ""}</div>
+
+        <div class="acoes">
+          <a href="${item.link}" target="_blank" class="btn-abrir">Abrir</a>
+          <button class="btn-excluir" onclick="excluir('${item.id}')">Excluir</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  carregarLinks();
+</script>
+
+</body>
+</html>
