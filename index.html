@@ -16,6 +16,7 @@
     body {
       background: #f5f7fa;
       color: #333;
+      min-height: 100vh;
     }
 
     header {
@@ -23,6 +24,16 @@
       color: white;
       padding: 25px;
       text-align: center;
+    }
+
+    header h1 {
+      font-size: 32px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 15px;
+      opacity: 0.9;
     }
 
     main {
@@ -46,6 +57,7 @@
       background: #dbeafe;
       color: #0f3d75;
       font-weight: bold;
+      transition: 0.2s;
     }
 
     .filter-btn.active,
@@ -56,8 +68,9 @@
 
     .container {
       display: grid;
-      grid-template-columns: 350px 1fr;
+      grid-template-columns: 370px 1fr;
       gap: 25px;
+      align-items: start;
     }
 
     .card {
@@ -77,6 +90,7 @@
       margin-top: 15px;
       margin-bottom: 5px;
       font-weight: bold;
+      color: #374151;
     }
 
     input,
@@ -87,6 +101,14 @@
       border-radius: 10px;
       border: 1px solid #d1d5db;
       outline: none;
+      font-size: 14px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
     }
 
     textarea {
@@ -94,17 +116,35 @@
       min-height: 80px;
     }
 
-    .btn-save {
+    .btn-save,
+    .btn-cancel {
       width: 100%;
       margin-top: 20px;
       border: none;
-      background: #22c55e;
       color: white;
       padding: 14px;
       border-radius: 10px;
       cursor: pointer;
       font-weight: bold;
       font-size: 15px;
+    }
+
+    .btn-save {
+      background: #22c55e;
+    }
+
+    .btn-save:hover {
+      background: #16a34a;
+    }
+
+    .btn-cancel {
+      display: none;
+      background: #6b7280;
+      margin-top: 10px;
+    }
+
+    .btn-cancel:hover {
+      background: #4b5563;
     }
 
     .search-box {
@@ -123,6 +163,11 @@
       padding: 18px;
       box-shadow: 0 5px 15px rgba(0,0,0,.08);
       border-left: 6px solid #facc15;
+      transition: 0.2s;
+    }
+
+    .link-card:hover {
+      transform: translateY(-3px);
     }
 
     .categoria {
@@ -141,38 +186,69 @@
       font-weight: bold;
       color: #0f3d75;
       margin-bottom: 10px;
+      word-break: break-word;
     }
 
     .descricao {
       font-size: 14px;
       color: #666;
       margin-bottom: 15px;
+      word-break: break-word;
     }
 
     .acoes {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .btn-abrir {
+    .btn-abrir,
+    .btn-planilha,
+    .btn-editar,
+    .btn-excluir {
       flex: 1;
-      background: #2563eb;
+      min-width: 85px;
+      border: none;
       color: white;
       text-decoration: none;
       text-align: center;
       padding: 10px;
       border-radius: 8px;
       font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-abrir {
+      background: #2563eb;
+    }
+
+    .btn-planilha {
+      background: #22c55e;
+    }
+
+    .btn-editar {
+      background: #f59e0b;
     }
 
     .btn-excluir {
-      border: none;
       background: #ef4444;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
+    }
+
+    .btn-abrir:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-planilha:hover {
+      background: #16a34a;
+    }
+
+    .btn-editar:hover {
+      background: #d97706;
+    }
+
+    .btn-excluir:hover {
+      background: #dc2626;
     }
 
     .empty {
@@ -181,11 +257,23 @@
       border-radius: 15px;
       text-align: center;
       color: #777;
+      grid-column: 1 / -1;
+    }
+
+    footer {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      padding: 25px;
     }
 
     @media(max-width:900px) {
       .container {
         grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 26px;
       }
     }
   </style>
@@ -210,9 +298,11 @@
   <div class="container">
 
     <div class="card">
-      <h2>Novo Link</h2>
+      <h2 id="tituloForm">Novo Link</h2>
 
       <form id="formLink">
+        <input type="hidden" id="idEdicao">
+
         <label>Nome do Sistema</label>
         <input type="text" id="nome" required>
 
@@ -230,7 +320,11 @@
         <label>Descrição</label>
         <textarea id="descricao"></textarea>
 
-        <button type="submit" class="btn-save">Salvar Link</button>
+        <label>Link da Planilha Google Sheets</label>
+        <input type="url" id="planilha" placeholder="https://docs.google.com/spreadsheets/d/...">
+
+        <button type="submit" class="btn-save" id="btnSalvar">Salvar Link</button>
+        <button type="button" class="btn-cancel" id="btnCancelar" onclick="limparFormulario()">Cancelar Edição</button>
       </form>
     </div>
 
@@ -251,6 +345,10 @@
 
 </main>
 
+<footer>
+  Desenvolvido por <strong><em>Roberto Lino</em></strong>
+</footer>
+
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuSAF6BmB_UNiEw3BQhZ9RPVqM2X7jTORjtnI2-sIEZbSUGcIjBs7RDKVD7GGVWSCK/exec";
 
@@ -260,27 +358,40 @@
   document.getElementById("formLink").addEventListener("submit", async function(e) {
     e.preventDefault();
 
+    const idEdicao = document.getElementById("idEdicao").value;
+
     const item = {
-      id: Date.now(),
+      id: idEdicao || Date.now(),
       nome: document.getElementById("nome").value,
       categoria: document.getElementById("categoria").value,
       link: document.getElementById("link").value,
-      descricao: document.getElementById("descricao").value
+      descricao: document.getElementById("descricao").value,
+      planilha: document.getElementById("planilha").value
     };
+
+    if (idEdicao) {
+      item.action = "edit";
+    }
 
     await fetch(SCRIPT_URL, {
       method: "POST",
       body: JSON.stringify(item)
     });
 
-    this.reset();
+    limparFormulario();
     carregarLinks();
   });
 
   async function carregarLinks() {
-    const resposta = await fetch(SCRIPT_URL);
-    links = await resposta.json();
-    renderizarLinks();
+    try {
+      const resposta = await fetch(SCRIPT_URL);
+      links = await resposta.json();
+      renderizarLinks();
+    } catch (erro) {
+      document.getElementById("listaLinks").innerHTML = `
+        <div class="empty">Não foi possível carregar os links.</div>
+      `;
+    }
   }
 
   function filtrar(categoria, botao) {
@@ -292,6 +403,28 @@
 
     botao.classList.add("active");
     renderizarLinks();
+  }
+
+  function editar(id) {
+    const item = links.find(link => String(link.id) === String(id));
+
+    if (!item) return;
+
+    document.getElementById("idEdicao").value = item.id;
+    document.getElementById("nome").value = item.nome || "";
+    document.getElementById("categoria").value = item.categoria || "";
+    document.getElementById("link").value = item.link || "";
+    document.getElementById("descricao").value = item.descricao || "";
+    document.getElementById("planilha").value = item.planilha || "";
+
+    document.getElementById("tituloForm").innerText = "Editar Link";
+    document.getElementById("btnSalvar").innerText = "Salvar Alterações";
+    document.getElementById("btnCancelar").style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   }
 
   async function excluir(id) {
@@ -308,6 +441,14 @@
     carregarLinks();
   }
 
+  function limparFormulario() {
+    document.getElementById("formLink").reset();
+    document.getElementById("idEdicao").value = "";
+    document.getElementById("tituloForm").innerText = "Novo Link";
+    document.getElementById("btnSalvar").innerText = "Salvar Link";
+    document.getElementById("btnCancelar").style.display = "none";
+  }
+
   function renderizarLinks() {
     const lista = document.getElementById("listaLinks");
     const textoBusca = document.getElementById("busca").value.toLowerCase();
@@ -317,10 +458,11 @@
         filtroAtual === "Todos" || item.categoria === filtroAtual;
 
       const buscaOk =
-        String(item.nome).toLowerCase().includes(textoBusca) ||
-        String(item.categoria).toLowerCase().includes(textoBusca) ||
-        String(item.descricao).toLowerCase().includes(textoBusca) ||
-        String(item.link).toLowerCase().includes(textoBusca);
+        String(item.nome || "").toLowerCase().includes(textoBusca) ||
+        String(item.categoria || "").toLowerCase().includes(textoBusca) ||
+        String(item.descricao || "").toLowerCase().includes(textoBusca) ||
+        String(item.link || "").toLowerCase().includes(textoBusca) ||
+        String(item.planilha || "").toLowerCase().includes(textoBusca);
 
       return categoriaOk && buscaOk;
     });
@@ -332,12 +474,18 @@
 
     lista.innerHTML = resultado.map(item => `
       <div class="link-card">
-        <div class="categoria">${item.categoria}</div>
-        <div class="titulo">${item.nome}</div>
+        <div class="categoria">${item.categoria || "Sem categoria"}</div>
+        <div class="titulo">${item.nome || "Sem nome"}</div>
         <div class="descricao">${item.descricao || ""}</div>
 
         <div class="acoes">
           <a href="${item.link}" target="_blank" class="btn-abrir">Abrir</a>
+
+          ${item.planilha ? `
+            <a href="${item.planilha}" target="_blank" class="btn-planilha">Planilha</a>
+          ` : ""}
+
+          <button class="btn-editar" onclick="editar('${item.id}')">Editar</button>
           <button class="btn-excluir" onclick="excluir('${item.id}')">Excluir</button>
         </div>
       </div>
