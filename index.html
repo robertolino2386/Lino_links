@@ -28,7 +28,52 @@
       --radius-xl: 24px;
       --radius-lg: 18px;
       --radius-md: 13px;
+      --sidebar-bg: rgba(5, 11, 20, .76);
+      --field-bg: rgba(5, 11, 20, .5);
+      --field-focus-bg: rgba(9, 18, 31, .9);
     }
+
+    body.theme-white {
+      --bg: #f4f7fb;
+      --surface: rgba(255, 255, 255, .90);
+      --surface-solid: #ffffff;
+      --surface-soft: #eef3f8;
+      --border: rgba(15, 23, 42, .10);
+      --border-strong: rgba(2, 132, 199, .25);
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow: 0 24px 60px rgba(15, 23, 42, .10);
+      --sidebar-bg: rgba(255, 255, 255, .86);
+      --field-bg: rgba(248, 250, 252, .96);
+      --field-focus-bg: #ffffff;
+    }
+
+    body.theme-white::before {
+      opacity: .5;
+      background-image:
+        linear-gradient(rgba(15, 23, 42, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, .035) 1px, transparent 1px);
+    }
+
+    body.theme-white .topbar h2 span {
+      background: linear-gradient(90deg, #0284c7, #7c3aed);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    body.theme-white .link-card,
+    body.theme-white .toolbar,
+    body.theme-white .stat-card {
+      background: rgba(255,255,255,.82);
+    }
+
+    body.theme-white .field label,
+    body.theme-white .panel-heading h3,
+    body.theme-white .titulo { color: #0f172a; }
+
+    body.theme-white .sidebar-footer { background: rgba(248,250,252,.9); }
+
+    body.theme-white .toast { background: #ffffff; }
 
     * {
       box-sizing: border-box;
@@ -93,7 +138,7 @@
       height: 100vh;
       padding: 28px 20px;
       border-right: 1px solid var(--border);
-      background: rgba(5, 11, 20, .76);
+      background: var(--sidebar-bg);
       backdrop-filter: blur(22px);
       z-index: 20;
     }
@@ -305,6 +350,43 @@
       height: 18px;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .theme-switch {
+      display: inline-flex;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .theme-btn {
+      min-height: 36px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+      transition: .2s ease;
+    }
+
+    .theme-btn.active {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(14,165,233,.2);
+    }
+
     .workspace {
       display: grid;
       grid-template-columns: 360px minmax(0, 1fr);
@@ -383,7 +465,7 @@
       width: 100%;
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      background: rgba(5, 11, 20, .5);
+      background: var(--field-bg);
       color: var(--text);
       outline: none;
       transition: .2s ease;
@@ -406,7 +488,7 @@
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--primary);
-      background: rgba(9, 18, 31, .9);
+      background: var(--field-focus-bg);
       box-shadow: 0 0 0 4px rgba(56, 189, 248, .08);
     }
 
@@ -960,10 +1042,16 @@
           <h2>Seu ecossistema, <span>um só lugar.</span></h2>
           <p>Acesse, organize e gerencie todos os seus sistemas com agilidade.</p>
         </div>
-        <button class="new-link-btn" type="button" onclick="abrirFormulario()" aria-label="Cadastrar novo sistema">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>
-          <span>Novo sistema</span>
-        </button>
+        <div class="topbar-actions">
+          <div class="theme-switch" aria-label="Alternar identidade visual">
+            <button class="theme-btn" id="btnWhite" type="button" onclick="setTheme('white')">White Label</button>
+            <button class="theme-btn active" id="btnBlack" type="button" onclick="setTheme('black')">Black Label</button>
+          </div>
+          <button class="new-link-btn" type="button" onclick="abrirFormulario()" aria-label="Cadastrar novo sistema">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Novo sistema</span>
+          </button>
+        </div>
       </header>
 
       <div class="mobile-filters" aria-label="Filtros de categoria para celular">
@@ -1004,6 +1092,11 @@
             </div>
 
             <div class="field">
+              <label for="area">Área <span>*</span></label>
+              <input type="text" id="area" required maxlength="100" placeholder="Ex.: Financeiro, Conciliação, Comercial">
+            </div>
+
+            <div class="field">
               <label for="link">Link do sistema <span>*</span></label>
               <input type="url" id="link" required placeholder="https://seusistema.com">
             </div>
@@ -1040,16 +1133,16 @@
               <div class="stat-meta">filtro selecionado</div>
             </article>
             <article class="stat-card" style="--glow: var(--success)">
-              <div class="stat-label">Com planilha</div>
-              <div class="stat-value" id="statPlanilhas">0</div>
-              <div class="stat-meta">bases conectadas</div>
+              <div class="stat-label">Áreas mapeadas</div>
+              <div class="stat-value" id="statAreas">0</div>
+              <div class="stat-meta">áreas distintas</div>
             </article>
           </div>
 
           <div class="toolbar">
             <div class="search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="search" id="busca" placeholder="Buscar por nome, categoria ou descrição..." oninput="renderizarLinks()" autocomplete="off">
+              <input type="search" id="busca" placeholder="Buscar por nome, área, categoria ou descrição..." oninput="renderizarLinks()" autocomplete="off">
             </div>
             <div class="result-count" id="resultCount">Carregando...</div>
           </div>
@@ -1099,6 +1192,7 @@
         id: idEdicao || Date.now(),
         nome: document.getElementById("nome").value.trim(),
         categoria: document.getElementById("categoria").value,
+        area: document.getElementById("area").value.trim(),
         link: document.getElementById("link").value.trim(),
         descricao: document.getElementById("descricao").value.trim(),
         planilha: document.getElementById("planilha").value.trim()
@@ -1165,6 +1259,7 @@
       document.getElementById("idEdicao").value = item.id;
       document.getElementById("nome").value = item.nome || "";
       document.getElementById("categoria").value = item.categoria || "";
+      document.getElementById("area").value = item.area || "";
       document.getElementById("link").value = item.link || "";
       document.getElementById("descricao").value = item.descricao || "";
       document.getElementById("planilha").value = item.planilha || "";
@@ -1214,7 +1309,8 @@
       });
 
       document.getElementById("statTotal").textContent = links.length;
-      document.getElementById("statPlanilhas").textContent = links.filter(item => item.planilha).length;
+      const areas = new Set(links.map(item => String(item.area || "").trim()).filter(Boolean));
+      document.getElementById("statAreas").textContent = areas.size;
     }
 
     function renderizarLinks() {
@@ -1224,7 +1320,7 @@
       const resultado = links.filter(item => {
         const categoriaOk = filtroAtual === "Todos" || item.categoria === filtroAtual;
         const buscaOk = [
-          item.nome, item.categoria, item.descricao, item.link, item.planilha
+          item.nome, item.area, item.categoria, item.descricao, item.link, item.planilha
         ].some(valor => String(valor || "").toLowerCase().includes(textoBusca));
         return categoriaOk && buscaOk;
       });
@@ -1242,6 +1338,7 @@
 
       lista.innerHTML = resultado.map(item => {
         const categoria = escapeHtml(item.categoria || "Sem categoria");
+        const area = escapeHtml(item.area || "Sem área");
         const nome = escapeHtml(item.nome || "Sem nome");
         const descricao = escapeHtml(item.descricao || "Acesso rápido ao sistema.");
         const link = safeUrl(item.link);
@@ -1257,7 +1354,7 @@
               <div class="categoria">${categoria}</div>
             </div>
             <div class="titulo">${nome}</div>
-            <div class="descricao">${descricao}</div>
+            <div class="descricao"><strong>${area}</strong> · ${descricao}</div>
             <div class="acoes">
               <a href="${link}" target="_blank" rel="noopener noreferrer" class="action-btn btn-open">
                 ${icons.external} Abrir sistema
@@ -1328,6 +1425,17 @@
       document.getElementById("toastText").textContent = mensagem;
       toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
     }
+
+    function setTheme(theme) {
+      const isWhite = theme === "white";
+      document.body.classList.toggle("theme-white", isWhite);
+      document.getElementById("btnWhite").classList.toggle("active", isWhite);
+      document.getElementById("btnBlack").classList.toggle("active", !isWhite);
+      localStorage.setItem("systemHubTheme", isWhite ? "white" : "black");
+    }
+
+    const savedTheme = localStorage.getItem("systemHubTheme") || "black";
+    setTheme(savedTheme);
 
     carregarLinks();
   </script>
