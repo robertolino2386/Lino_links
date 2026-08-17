@@ -126,6 +126,26 @@
       outline-offset: 2px;
     }
 
+
+    /* Menu lateral recolhivel */
+    .app-shell, .sidebar { transition: .28s ease; }
+    .app-shell.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
+    .app-shell.sidebar-collapsed .sidebar {
+      width: 0; padding-left: 0; padding-right: 0; border-right: 0;
+      overflow: hidden; opacity: 0; pointer-events: none; transform: translateX(-100%);
+    }
+    .sidebar-toggle {
+      position: fixed; top: 18px; left: 248px; z-index: 60;
+      display: grid; place-items: center; width: 42px; height: 42px;
+      border: 1px solid var(--border); border-radius: 13px;
+      background: var(--surface-solid); color: var(--text); cursor: pointer;
+      box-shadow: var(--shadow); transition: .28s ease;
+    }
+    .sidebar-toggle:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+    .sidebar-toggle svg { width: 20px; height: 20px; transition: transform .28s ease; }
+    .app-shell.sidebar-collapsed .sidebar-toggle { left: 18px; }
+    .app-shell.sidebar-collapsed .sidebar-toggle svg { transform: rotate(180deg); }
+
     .app-shell {
       display: grid;
       grid-template-columns: 270px minmax(0, 1fr);
@@ -895,11 +915,20 @@
     }
 
     @media (max-width: 920px) {
+      .sidebar-toggle { left: 18px; top: 16px; }
+      .app-shell .sidebar {
+        display: block; position: fixed; inset: 0 auto 0 0; width: 270px;
+        transform: translateX(-100%); opacity: 0; pointer-events: none;
+        box-shadow: 24px 0 60px rgba(0,0,0,.28);
+      }
+      .app-shell.sidebar-open .sidebar { transform: translateX(0); opacity: 1; pointer-events: auto; }
+      .app-shell.sidebar-open .sidebar-toggle { left: 248px; }
+      .app-shell.sidebar-open .sidebar-toggle svg { transform: none; }
       .app-shell {
         display: block;
       }
       .sidebar {
-        display: none;
+        display: block;
       }
       .content {
         padding: 28px 20px;
@@ -995,6 +1024,10 @@
 </head>
 <body>
   <div class="app-shell">
+    <button class="sidebar-toggle" id="sidebarToggle" type="button" onclick="toggleSidebar()" aria-label="Esconder menu lateral" title="Esconder menu lateral">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">
@@ -1424,6 +1457,31 @@
       toast.className = `toast ${tipo} show`;
       document.getElementById("toastText").textContent = mensagem;
       toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
+    }
+
+
+    function toggleSidebar() {
+      const shell = document.querySelector(".app-shell");
+      const botao = document.getElementById("sidebarToggle");
+      const mobile = window.matchMedia("(max-width: 920px)").matches;
+
+      if (mobile) {
+        const aberto = shell.classList.toggle("sidebar-open");
+        botao.setAttribute("aria-label", aberto ? "Esconder menu lateral" : "Mostrar menu lateral");
+        botao.title = aberto ? "Esconder menu lateral" : "Mostrar menu lateral";
+        return;
+      }
+
+      const recolhido = shell.classList.toggle("sidebar-collapsed");
+      botao.setAttribute("aria-label", recolhido ? "Mostrar menu lateral" : "Esconder menu lateral");
+      botao.title = recolhido ? "Mostrar menu lateral" : "Esconder menu lateral";
+      localStorage.setItem("systemHubSidebar", recolhido ? "collapsed" : "open");
+    }
+
+    if (localStorage.getItem("systemHubSidebar") === "collapsed" && !window.matchMedia("(max-width: 920px)").matches) {
+      document.querySelector(".app-shell").classList.add("sidebar-collapsed");
+      document.getElementById("sidebarToggle").setAttribute("aria-label", "Mostrar menu lateral");
+      document.getElementById("sidebarToggle").title = "Mostrar menu lateral";
     }
 
     function setTheme(theme) {
